@@ -23,13 +23,16 @@ var gameOver = false;
 var restartButton;
 
 var player;
-var cursors;
 var stars;
 var bombs;
 
 var collectStarSound;
 var hitBombSound;
 var backgroundMusic;
+
+var leftButton;
+var rightButton;
+var jumpButton;
 
 var game = new Phaser.Game(config);
 
@@ -40,6 +43,9 @@ function preload() {
     this.load.image('star', 'assets/star.png');
     this.load.image('bomb', 'assets/bomb.png');
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
+    this.load.image('leftButton', 'assets/leftButton.png');
+    this.load.image('rightButton', 'assets/rightButton.png');
+    this.load.image('jumpButton', 'assets/jumpButton.png');
 
     this.load.audio('collectStar', 'assets/collectStar.mp3');
     this.load.audio('hitBomb', 'assets/hitBomb.mp3');
@@ -53,7 +59,7 @@ function create() {
 
     backgroundMusic.play();
 
-    this.add.image(400, 300, 'sky');
+    this.add.image(400, 185, 'sky');
 
     var platforms = this.physics.add.staticGroup();
     platforms.create(400, 330, 'floor').setScale(2).refreshBody();
@@ -123,6 +129,22 @@ function create() {
         .on('pointerdown', function () {
             restartGame.call(this);
         }, this);
+
+    leftButton = this.add.sprite(50, 320, 'leftButton').setInteractive();
+    leftButton.setScrollFactor(0);
+    leftButton.setScale(2);
+
+    rightButton = this.add.sprite(170, 320, 'rightButton').setInteractive();
+    rightButton.setScrollFactor(0);
+    rightButton.setScale(2);
+
+    jumpButton = this.add.sprite(750, 320, 'jumpButton').setInteractive();
+    jumpButton.setScrollFactor(0);
+    jumpButton.setScale(2);
+    
+    this.cameras.main.setBounds(0, 0, 800, 370);
+    this.physics.world.setBounds(0, 0, 800, 370);
+    this.cameras.main.startFollow(player, true, 0.08, 0.08);
 }
 
 function update() {
@@ -130,16 +152,31 @@ function update() {
         return;
     }
 
-    if (cursors.left.isDown) {
+    leftButton.on('pointerdown', function (pointer) {
         player.setVelocityX(-200);
         player.anims.play('left', true);
-    } else if (cursors.right.isDown) {
-        player.setVelocityX(200);
-        player.anims.play('right', true);
-    } else {
+    });
+
+    leftButton.on('pointerup', function (pointer) {
         player.setVelocityX(0);
         player.anims.play('turn');
-    }
+    });
+
+    rightButton.on('pointerdown', function (pointer) {
+        player.setVelocityX(200);
+        player.anims.play('right', true);
+    });
+
+    rightButton.on('pointerup', function (pointer) {
+        player.setVelocityX(0);
+        player.anims.play('turn');
+    });
+
+    jumpButton.on('pointerdown', function (pointer) {
+        if (player.body.touching.down) {
+            player.setVelocityY(-600);
+        }
+    });
 
     if (cursors.up.isDown && player.body.touching.down) {
         player.setVelocityY(-600);
