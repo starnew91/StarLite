@@ -2,7 +2,7 @@
 var config = {
     type: Phaser.AUTO,
     width: 800,
-    height: 600,
+    height: 370,
     physics: {
         default: 'arcade',
         arcade: {
@@ -56,14 +56,14 @@ function create() {
     this.add.image(400, 300, 'sky');
 
     var platforms = this.physics.add.staticGroup();
-    platforms.create(400, 568, 'floor').setScale(2).refreshBody();
-    platforms.create(300, 500, 'ground').setScale(0.5).refreshBody();
-    platforms.create(600, 450, 'ground').setScale(0.5).refreshBody();
-    platforms.create(750, 350, 'ground').setScale(0.5).refreshBody();
-    platforms.create(150, 300, 'ground').setScale(0.5).refreshBody();
-    platforms.create(500, 200, 'ground').setScale(0.5).refreshBody();
+    platforms.create(400, 330, 'floor').setScale(2).refreshBody();
+    platforms.create(130, 110, 'ground').setScale(0.4).refreshBody();
+    platforms.create(600, 220, 'ground').setScale(0.4).refreshBody();
+    platforms.create(450, 100, 'ground').setScale(0.4).refreshBody();
+    platforms.create(750, 110, 'ground').setScale(0.4).refreshBody();
+    platforms.create(250, 220, 'ground').setScale(0.4).refreshBody();
 
-    player = this.physics.add.sprite(100, 450, 'dude');
+    player = this.physics.add.sprite(100, 250, 'dude');
     player.setCollideWorldBounds(true);
     player.setBounce(0.1);
 
@@ -142,7 +142,7 @@ function update() {
     }
 
     if (cursors.up.isDown && player.body.touching.down) {
-        player.setVelocityY(-700);
+        player.setVelocityY(-600);
     }
 }
 
@@ -185,7 +185,7 @@ function restartGame() {
     this.physics.resume();
     player.clearTint();
     player.setX(100);
-    player.setY(450);
+    player.setY(250);
 
     stars.children.iterate(function (child) {
         child.enableBody(true, child.x, 0, true, true);
