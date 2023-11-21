@@ -34,7 +34,6 @@ var leftButton;
 var rightButton;
 var jumpButton;
 
-var cursors;
 var leftButtonDown = false;
 var rightButtonDown = false;
 var jumpButtonDown = false;
@@ -147,40 +146,34 @@ function create() {
     jumpButton.setScrollFactor(0);
     jumpButton.setScale(2);
 
-    this.cameras.main.setBounds(0, 0, 800, 370);
-    this.physics.world.setBounds(0, 0, 800, 370);
-    this.cameras.main.startFollow(player, true, 0.08, 0.08);
-
-    // Configurar interacción de entrada
+    // Configuración de interacción de entrada para los botones
     leftButton.on('pointerdown', function (pointer) {
         leftButtonDown = true;
-        handleInput();
     });
 
     leftButton.on('pointerup', function (pointer) {
         leftButtonDown = false;
-        handleInput();
     });
 
     rightButton.on('pointerdown', function (pointer) {
         rightButtonDown = true;
-        handleInput();
     });
 
     rightButton.on('pointerup', function (pointer) {
         rightButtonDown = false;
-        handleInput();
     });
 
     jumpButton.on('pointerdown', function (pointer) {
         jumpButtonDown = true;
-        handleInput();
     });
 
     jumpButton.on('pointerup', function (pointer) {
         jumpButtonDown = false;
-        handleInput();
     });
+
+    this.cameras.main.setBounds(0, 0, 800, 370);
+    this.physics.world.setBounds(0, 0, 800, 370);
+    this.cameras.main.startFollow(player, true, 0.08, 0.08);
 }
 
 function update() {
@@ -188,11 +181,11 @@ function update() {
         return;
     }
 
+    // Manejar entrada de botones
     handleInput();
 
-    if (cursors.up.isDown && player.body.touching.down) {
-        player.setVelocityY(-600);
-    }
+    // Resto del código de actualización
+    // ...
 }
 
 function handleInput() {
