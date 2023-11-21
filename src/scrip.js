@@ -30,13 +30,11 @@ var collectStarSound;
 var hitBombSound;
 var backgroundMusic;
 
-var leftButton;
-var rightButton;
+var joystick;
 var jumpButton;
 
-var leftButtonDown = false;
-var rightButtonDown = false;
 var jumpButtonDown = false;
+var jumpButtonReleased = true;
 
 var game = new Phaser.Game(config);
 
@@ -47,8 +45,7 @@ function preload() {
     this.load.image('star', 'assets/star.png');
     this.load.image('bomb', 'assets/bomb.png');
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
-    this.load.image('leftButton', 'assets/leftButton.png');
-    this.load.image('rightButton', 'assets/rightButton.png');
+    this.load.image('joystick', 'assets/joystick.png');
     this.load.image('jumpButton', 'assets/jumpButton.png');
 
     this.load.audio('collectStar', 'assets/collectStar.mp3');
@@ -134,42 +131,19 @@ function create() {
             restartGame.call(this);
         }, this);
 
-    leftButton = this.add.sprite(50, 320, 'leftButton').setInteractive();
-    leftButton.setScrollFactor(0);
-    leftButton.setScale(2);
-
-    rightButton = this.add.sprite(170, 320, 'rightButton').setInteractive();
-    rightButton.setScrollFactor(0);
-    rightButton.setScale(2);
+    joystick = this.add.sprite(100, 320, 'joystick').setInteractive();
+    joystick.setScrollFactor(0);
+    joystick.setScale(2);
 
     jumpButton = this.add.sprite(750, 320, 'jumpButton').setInteractive();
     jumpButton.setScrollFactor(0);
     jumpButton.setScale(2);
 
-    // Configuración de interacción de entrada para los botones
-    leftButton.on('pointerdown', function (pointer) {
-        leftButtonDown = true;
-    });
+    this.input.setDraggable(joystick);
+    this.input.on('drag', onJoystickDrag, this);
 
-    leftButton.on('pointerup', function (pointer) {
-        leftButtonDown = false;
-    });
-
-    rightButton.on('pointerdown', function (pointer) {
-        rightButtonDown = true;
-    });
-
-    rightButton.on('pointerup', function (pointer) {
-        rightButtonDown = false;
-    });
-
-    jumpButton.on('pointerdown', function (pointer) {
-        jumpButtonDown = true;
-    });
-
-    jumpButton.on('pointerup', function (pointer) {
-        jumpButtonDown = false;
-    });
+    jumpButton.on('pointerdown', onJumpButtonDown);
+    jumpButton.on('pointerup', onJumpButtonUp);
 
     this.cameras.main.setBounds(0, 0, 800, 370);
     this.physics.world.setBounds(0, 0, 800, 370);
@@ -181,28 +155,48 @@ function update() {
         return;
     }
 
-    // Manejar entrada de botones
     handleInput();
 
-    // Resto del código de actualización
-    // ...
 }
 
 function handleInput() {
-    if (leftButtonDown) {
-        player.setVelocityX(-200);
-        player.anims.play('left', true);
-    } else if (rightButtonDown) {
-        player.setVelocityX(200);
+    var angle = Phaser.Math.Angle.Between(joystick.x, joystick.y, 100, 320);
+    var speed = Phaser.Math.Distance.Between(joystick.x, joystick.y, 100, 320);
+
+    if (speed > 20) {
+        player.setVelocityX(Math.cos(angle) * speed * 2);
         player.anims.play('right', true);
     } else {
         player.setVelocityX(0);
         player.anims.play('turn');
     }
 
-    if (jumpButtonDown && player.body.touching.down) {
+    if (jumpButtonDown && player.body.touching.down && jumpButtonReleased) {
         player.setVelocityY(-600);
+        jumpButtonReleased = false;
     }
+
+    if (!jumpButtonDown) {
+        jumpButtonReleased = true;
+    }
+}
+
+function onJoystickDrag(pointer, gameObject, dragX, dragY) {
+    var angle = Phaser.Math.Angle.Between(joystick.x, joystick.y, 100, 320);
+    var distance = Phaser.Math.Distance.Between(joystick.x, joystick.y, 100, 320);
+
+    if (distance > 60) {
+        joystick.x = 100 + Math.cos(angle) * 60;
+        joystick.y = 320 + Math.sin(angle) * 60;
+    }
+}
+
+function onJumpButtonDown(pointer) {
+    jumpButtonDown = true;
+}
+
+function onJumpButtonUp(pointer) {
+    jumpButtonDown = false;
 }
 
 function collectStar(player, star) {
