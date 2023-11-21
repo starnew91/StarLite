@@ -130,49 +130,48 @@ function create() {
             restartGame.call(this);
         }, this);
 
-    leftButton = this.add.sprite(50, 320, 'leftButton').setInteractive();
+    leftButton = this.add.sprite(50, 320, 'leftButton');
     leftButton.setScrollFactor(0);
     leftButton.setScale(2);
+    leftButton.setInteractive();
 
-    rightButton = this.add.sprite(170, 320, 'rightButton').setInteractive();
+    rightButton = this.add.sprite(170, 320, 'rightButton');
     rightButton.setScrollFactor(0);
     rightButton.setScale(2);
+    rightButton.setInteractive();
 
-    jumpButton = this.add.sprite(750, 320, 'jumpButton').setInteractive();
+    jumpButton = this.add.sprite(750, 320, 'jumpButton');
     jumpButton.setScrollFactor(0);
     jumpButton.setScale(2);
+    jumpButton.setInteractive();
 
-    // Agregar eventos multitáctiles
     this.input.addPointer(3);
 
     this.input.on('pointerdown', function (pointer) {
-        if (pointer.x < 400) {
-            // Tocó el lado izquierdo de la pantalla
+        if (pointer.downX < 100 && pointer.downY > 300) {
             player.setVelocityX(-200);
             player.anims.play('left', true);
-        } else {
-            // Tocó el lado derecho de la pantalla
+        } else if (pointer.downX > 100 && pointer.downX < 300 && pointer.downY > 300) {
             player.setVelocityX(200);
             player.anims.play('right', true);
-        }
-
-        // Verificar también el botón de salto
-        if ((player.body.touching.down || player.body.blocked.down) && pointer.y > 320) {
-            player.setVelocityY(-600);
+        } else if (pointer.downX > 700 && pointer.downY > 300) {
+            if (player.body.touching.down) {
+                player.setVelocityY(-600);
+            }
         }
     });
 
     this.input.on('pointerup', function (pointer) {
-        // Restablecer la animación cuando se levanta el dedo
-        player.setVelocityX(0);
-        player.anims.play('turn');
+        if (pointer.upX < 100 || (pointer.upX > 100 && pointer.upX < 300) || pointer.upX > 700) {
+            player.setVelocityX(0);
+            player.anims.play('turn');
+        }
     });
 
     this.cameras.main.setBounds(0, 0, 800, 370);
     this.physics.world.setBounds(0, 0, 800, 370);
     this.cameras.main.startFollow(player, true, 0.08, 0.08);
 }
-
 function update() {
     if (gameOver) {
         return;
