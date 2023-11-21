@@ -34,6 +34,10 @@ var leftButton;
 var rightButton;
 var jumpButton;
 
+var touchingLeft = false;
+var touchingRight = false;
+var touchingJump = false;
+
 var game = new Phaser.Game(config);
 
 function preload() {
@@ -145,16 +149,21 @@ function create() {
     jumpButton.setScale(2);
     jumpButton.setInteractive();
 
-    this.input.addPointer(3);
+    this.cameras.main.setBounds(0, 0, 800, 370);
+    this.physics.world.setBounds(0, 0, 800, 370);
+    this.cameras.main.startFollow(player, true, 0.08, 0.08);
 
     this.input.on('pointerdown', function (pointer) {
         if (pointer.downX < 100 && pointer.downY > 300) {
+            touchingLeft = true;
             player.setVelocityX(-200);
             player.anims.play('left', true);
         } else if (pointer.downX > 100 && pointer.downX < 300 && pointer.downY > 300) {
+            touchingRight = true;
             player.setVelocityX(200);
             player.anims.play('right', true);
         } else if (pointer.downX > 700 && pointer.downY > 300) {
+            touchingJump = true;
             if (player.body.touching.down) {
                 player.setVelocityY(-600);
             }
@@ -163,45 +172,25 @@ function create() {
 
     this.input.on('pointerup', function (pointer) {
         if (pointer.upX < 100 || (pointer.upX > 100 && pointer.upX < 300) || pointer.upX > 700) {
-            player.setVelocityX(0);
-            player.anims.play('turn');
+            if (touchingLeft) {
+                touchingLeft = false;
+                player.setVelocityX(0);
+                player.anims.play('turn');
+            } else if (touchingRight) {
+                touchingRight = false;
+                player.setVelocityX(0);
+                player.anims.play('turn');
+            } else if (touchingJump) {
+                touchingJump = false;
+            }
         }
     });
-
-    this.cameras.main.setBounds(0, 0, 800, 370);
-    this.physics.world.setBounds(0, 0, 800, 370);
-    this.cameras.main.startFollow(player, true, 0.08, 0.08);
 }
+
 function update() {
     if (gameOver) {
         return;
     }
-
-    leftButton.on('pointerdown', function (pointer) {
-        player.setVelocityX(-200);
-        player.anims.play('left', true);
-    });
-
-    leftButton.on('pointerup', function (pointer) {
-        player.setVelocityX(0);
-        player.anims.play('turn');
-    });
-
-    rightButton.on('pointerdown', function (pointer) {
-        player.setVelocityX(200);
-        player.anims.play('right', true);
-    });
-
-    rightButton.on('pointerup', function (pointer) {
-        player.setVelocityX(0);
-        player.anims.play('turn');
-    });
-
-    jumpButton.on('pointerdown', function (pointer) {
-        if (player.body.touching.down) {
-            player.setVelocityY(-600);
-        }
-    });
 
     if (cursors.up.isDown && player.body.touching.down) {
         player.setVelocityY(-600);
