@@ -34,10 +34,6 @@ var leftButton;
 var rightButton;
 var jumpButton;
 
-var touchingLeft = false;
-var touchingRight = false;
-var touchingJump = false;
-
 var game = new Phaser.Game(config);
 
 function preload() {
@@ -155,15 +151,15 @@ function create() {
 
     this.input.on('pointerdown', function (pointer) {
         if (pointer.downX < 100 && pointer.downY > 300) {
-            touchingLeft = true;
+            // Tocó el botón izquierdo
             player.setVelocityX(-200);
             player.anims.play('left', true);
         } else if (pointer.downX > 100 && pointer.downX < 300 && pointer.downY > 300) {
-            touchingRight = true;
+            // Tocó el botón derecho
             player.setVelocityX(200);
             player.anims.play('right', true);
         } else if (pointer.downX > 700 && pointer.downY > 300) {
-            touchingJump = true;
+            // Tocó el botón de salto
             if (player.body.touching.down) {
                 player.setVelocityY(-600);
             }
@@ -171,18 +167,14 @@ function create() {
     });
 
     this.input.on('pointerup', function (pointer) {
-        if (pointer.upX < 100 || (pointer.upX > 100 && pointer.upX < 300) || pointer.upX > 700) {
-            if (touchingLeft) {
-                touchingLeft = false;
-                player.setVelocityX(0);
-                player.anims.play('turn');
-            } else if (touchingRight) {
-                touchingRight = false;
-                player.setVelocityX(0);
-                player.anims.play('turn');
-            } else if (touchingJump) {
-                touchingJump = false;
-            }
+        if (pointer.upX < 100) {
+            // Levantó el dedo del botón izquierdo
+            player.setVelocityX(0);
+            player.anims.play('turn');
+        } else if (pointer.upX > 100 && pointer.upX < 300) {
+            // Levantó el dedo del botón derecho
+            player.setVelocityX(0);
+            player.anims.play('turn');
         }
     });
 }
