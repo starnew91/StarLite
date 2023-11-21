@@ -30,11 +30,12 @@ var collectStarSound;
 var hitBombSound;
 var backgroundMusic;
 
-var joystick;
+var leftButton;
+var rightButton;
 var jumpButton;
 
-var jumpButtonDown = false;
-var jumpButtonReleased = true;
+var leftButtonDown = false;
+var rightButtonDown = false;
 
 var game = new Phaser.Game(config);
 
@@ -45,7 +46,8 @@ function preload() {
     this.load.image('star', 'assets/star.png');
     this.load.image('bomb', 'assets/bomb.png');
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
-    this.load.image('joystick', 'assets/joystick.png');
+    this.load.image('leftButton', 'assets/leftButton.png');
+    this.load.image('rightButton', 'assets/rightButton.png');
     this.load.image('jumpButton', 'assets/jumpButton.png');
 
     this.load.audio('collectStar', 'assets/collectStar.mp3');
@@ -131,23 +133,73 @@ function create() {
             restartGame.call(this);
         }, this);
 
-    joystick = this.add.sprite(100, 320, 'joystick').setInteractive();
-    joystick.setScrollFactor(0);
-    joystick.setScale(2);
+    leftButton = this.add.sprite(50, 320, 'leftButton').setInteractive();
+    leftButton.setScrollFactor(0);
+    leftButton.setScale(2);
+
+    rightButton = this.add.sprite(170, 320, 'rightButton').setInteractive();
+    rightButton.setScrollFactor(0);
+    rightButton.setScale(2);
 
     jumpButton = this.add.sprite(750, 320, 'jumpButton').setInteractive();
     jumpButton.setScrollFactor(0);
     jumpButton.setScale(2);
 
-    this.input.setDraggable(joystick);
-    this.input.on('drag', onJoystickDrag, this);
+    leftButton.on('pointerdown', function (pointer) {
+        leftButtonDown = true;
+        player.setVelocityX(-200);
+        player.anims.play('left', true);
+    });
 
-    jumpButton.on('pointerdown', onJumpButtonDown);
-    jumpButton.on('pointerup', onJumpButtonUp);
+    leftButton.on('pointerup', function (pointer) {
+        leftButtonDown = false;
+        if (!rightButtonDown) {
+            player.setVelocityX(0);
+            player.anims.play('turn');
+        }
+    });
+
+    rightButton.on('pointerdown', function (pointer) {
+        rightButtonDown = true;
+        player.setVelocityX(200);
+        player.anims.play('right', true);
+    });
+
+    rightButton.on('pointerup', function (pointer) {
+        rightButtonDown = false;
+        if (!leftButtonDown) {
+            player.setVelocityX(0);
+            player.anims.play('turn');
+        }
+    });
+
+    jumpButton.on('pointerdown', function (pointer) {
+        if (player.body.touching.down) {
+            player.setVelocityY(-600);
+        }
+    });
+
+    setupInput();
 
     this.cameras.main.setBounds(0, 0, 800, 370);
     this.physics.world.setBounds(0, 0, 800, 370);
     this.cameras.main.startFollow(player, true, 0.08, 0.08);
+}
+
+function setupInput() {
+    this.input.on('pointerup', function (pointer) {
+        stopMoving();
+    });
+}
+
+function stopMoving() {
+    leftButtonDown = false;
+    rightButtonDown = false;
+
+    if (!leftButtonDown && !rightButtonDown) {
+        player.setVelocityX(0);
+        player.anims.play('turn');
+    }
 }
 
 function update() {
@@ -155,48 +207,7 @@ function update() {
         return;
     }
 
-    handleInput();
-
-}
-
-function handleInput() {
-    var angle = Phaser.Math.Angle.Between(joystick.x, joystick.y, 100, 320);
-    var speed = Phaser.Math.Distance.Between(joystick.x, joystick.y, 100, 320);
-
-    if (speed > 20) {
-        player.setVelocityX(Math.cos(angle) * speed * 2);
-        player.anims.play('right', true);
-    } else {
-        player.setVelocityX(0);
-        player.anims.play('turn');
-    }
-
-    if (jumpButtonDown && player.body.touching.down && jumpButtonReleased) {
-        player.setVelocityY(-600);
-        jumpButtonReleased = false;
-    }
-
-    if (!jumpButtonDown) {
-        jumpButtonReleased = true;
-    }
-}
-
-function onJoystickDrag(pointer, gameObject, dragX, dragY) {
-    var angle = Phaser.Math.Angle.Between(joystick.x, joystick.y, 100, 320);
-    var distance = Phaser.Math.Distance.Between(joystick.x, joystick.y, 100, 320);
-
-    if (distance > 60) {
-        joystick.x = 100 + Math.cos(angle) * 60;
-        joystick.y = 320 + Math.sin(angle) * 60;
-    }
-}
-
-function onJumpButtonDown(pointer) {
-    jumpButtonDown = true;
-}
-
-function onJumpButtonUp(pointer) {
-    jumpButtonDown = false;
+    // ... (tu código de actualización del juego)
 }
 
 function collectStar(player, star) {
