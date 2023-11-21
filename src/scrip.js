@@ -141,7 +141,33 @@ function create() {
     jumpButton = this.add.sprite(750, 320, 'jumpButton').setInteractive();
     jumpButton.setScrollFactor(0);
     jumpButton.setScale(2);
-    
+
+    // Agregar eventos multitáctiles
+    this.input.addPointer(3);
+
+    this.input.on('pointerdown', function (pointer) {
+        if (pointer.x < 400) {
+            // Tocó el lado izquierdo de la pantalla
+            player.setVelocityX(-200);
+            player.anims.play('left', true);
+        } else {
+            // Tocó el lado derecho de la pantalla
+            player.setVelocityX(200);
+            player.anims.play('right', true);
+        }
+
+        // Verificar también el botón de salto
+        if ((player.body.touching.down || player.body.blocked.down) && pointer.y > 320) {
+            player.setVelocityY(-600);
+        }
+    });
+
+    this.input.on('pointerup', function (pointer) {
+        // Restablecer la animación cuando se levanta el dedo
+        player.setVelocityX(0);
+        player.anims.play('turn');
+    });
+
     this.cameras.main.setBounds(0, 0, 800, 370);
     this.physics.world.setBounds(0, 0, 800, 370);
     this.cameras.main.startFollow(player, true, 0.08, 0.08);
