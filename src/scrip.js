@@ -35,11 +35,9 @@ var rightButton;
 var jumpButton;
 
 var cursors;
-var buttonTouched = {
-    left: false,
-    right: false,
-    jump: false
-};
+var leftButtonDown = false;
+var rightButtonDown = false;
+var jumpButtonDown = false;
 
 var game = new Phaser.Game(config);
 
@@ -153,33 +151,34 @@ function create() {
     this.physics.world.setBounds(0, 0, 800, 370);
     this.cameras.main.startFollow(player, true, 0.08, 0.08);
 
-    this.input.on('gameobjectdown', function (pointer, gameObject) {
-        switch (gameObject) {
-            case leftButton:
-                buttonTouched.left = true;
-                break;
-            case rightButton:
-                buttonTouched.right = true;
-                break;
-            case jumpButton:
-                buttonTouched.jump = true;
-                break;
-        }
+    // Configurar interacción de entrada
+    leftButton.on('pointerdown', function (pointer) {
+        leftButtonDown = true;
         handleInput();
     });
 
-    this.input.on('gameobjectup', function (pointer, gameObject) {
-        switch (gameObject) {
-            case leftButton:
-                buttonTouched.left = false;
-                break;
-            case rightButton:
-                buttonTouched.right = false;
-                break;
-            case jumpButton:
-                buttonTouched.jump = false;
-                break;
-        }
+    leftButton.on('pointerup', function (pointer) {
+        leftButtonDown = false;
+        handleInput();
+    });
+
+    rightButton.on('pointerdown', function (pointer) {
+        rightButtonDown = true;
+        handleInput();
+    });
+
+    rightButton.on('pointerup', function (pointer) {
+        rightButtonDown = false;
+        handleInput();
+    });
+
+    jumpButton.on('pointerdown', function (pointer) {
+        jumpButtonDown = true;
+        handleInput();
+    });
+
+    jumpButton.on('pointerup', function (pointer) {
+        jumpButtonDown = false;
         handleInput();
     });
 }
@@ -197,10 +196,10 @@ function update() {
 }
 
 function handleInput() {
-    if (buttonTouched.left) {
+    if (leftButtonDown) {
         player.setVelocityX(-200);
         player.anims.play('left', true);
-    } else if (buttonTouched.right) {
+    } else if (rightButtonDown) {
         player.setVelocityX(200);
         player.anims.play('right', true);
     } else {
@@ -208,7 +207,7 @@ function handleInput() {
         player.anims.play('turn');
     }
 
-    if (buttonTouched.jump && player.body.touching.down) {
+    if (jumpButtonDown && player.body.touching.down) {
         player.setVelocityY(-600);
     }
 }
