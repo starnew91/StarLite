@@ -34,9 +34,6 @@ var leftButton;
 var rightButton;
 var jumpButton;
 
-var leftButtonDown = false;
-var rightButtonDown = false;
-
 var game = new Phaser.Game(config);
 
 function preload() {
@@ -146,31 +143,23 @@ function create() {
     jumpButton.setScale(2);
 
     leftButton.on('pointerdown', function (pointer) {
-        leftButtonDown = true;
         player.setVelocityX(-200);
         player.anims.play('left', true);
     });
 
     leftButton.on('pointerup', function (pointer) {
-        leftButtonDown = false;
-        if (!rightButtonDown) {
-            player.setVelocityX(0);
-            player.anims.play('turn');
-        }
+        player.setVelocityX(0);
+        updatePlayerAnimation();
     });
 
     rightButton.on('pointerdown', function (pointer) {
-        rightButtonDown = true;
         player.setVelocityX(200);
         player.anims.play('right', true);
     });
 
     rightButton.on('pointerup', function (pointer) {
-        rightButtonDown = false;
-        if (!leftButtonDown) {
-            player.setVelocityX(0);
-            player.anims.play('turn');
-        }
+        player.setVelocityX(0);
+        updatePlayerAnimation();
     });
 
     jumpButton.on('pointerdown', function (pointer) {
@@ -179,27 +168,11 @@ function create() {
         }
     });
 
-    setupInput();
+    cursors = this.input.keyboard.createCursorKeys();
 
     this.cameras.main.setBounds(0, 0, 800, 370);
     this.physics.world.setBounds(0, 0, 800, 370);
     this.cameras.main.startFollow(player, true, 0.08, 0.08);
-}
-
-function setupInput() {
-    this.input.on('pointerup', function (pointer) {
-        stopMoving();
-    });
-}
-
-function stopMoving() {
-    leftButtonDown = false;
-    rightButtonDown = false;
-
-    if (!leftButtonDown && !rightButtonDown) {
-        player.setVelocityX(0);
-        player.anims.play('turn');
-    }
 }
 
 function update() {
@@ -207,7 +180,18 @@ function update() {
         return;
     }
 
-    // ... (tu código de actualización del juego)
+    updatePlayerAnimation();
+
+}
+
+function updatePlayerAnimation() {
+    if (player.body.velocity.x < 0) {
+        player.anims.play('left', true);
+    } else if (player.body.velocity.x > 0) {
+        player.anims.play('right', true);
+    } else {
+        player.anims.play('turn');
+    }
 }
 
 function collectStar(player, star) {
