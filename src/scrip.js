@@ -133,39 +133,39 @@ function create() {
             restartGame.call(this);
         }, this);
 
-    leftButton = this.add.sprite(50, 320, 'leftButton').setInteractive();
+    leftButton = this.add.sprite(50, 320, 'leftButton').setInteractive({ useHandCursor: true });
     leftButton.setScrollFactor(0);
     leftButton.setScale(2);
 
-    rightButton = this.add.sprite(170, 320, 'rightButton').setInteractive();
+    rightButton = this.add.sprite(170, 320, 'rightButton').setInteractive({ useHandCursor: true });
     rightButton.setScrollFactor(0);
     rightButton.setScale(2);
 
-    jumpButton = this.add.sprite(750, 320, 'jumpButton').setInteractive();
+    jumpButton = this.add.sprite(750, 320, 'jumpButton').setInteractive({ useHandCursor: true });
     jumpButton.setScrollFactor(0);
     jumpButton.setScale(2);
 
-    leftButton.on('pointerdown', function (pointer) {
-        player.setVelocityX(-200);
+    leftButton.on('pointerdown', function (pointer, localX, localY, event) {
+        player.setVelocityX(-300);
         player.anims.play('left', true);
     });
 
-    leftButton.on('pointerup', function (pointer) {
+    leftButton.on('pointerup', function (pointer, localX, localY, event) {
         player.setVelocityX(0);
         updatePlayerAnimation();
     });
 
-    rightButton.on('pointerdown', function (pointer) {
-        player.setVelocityX(200);
+    rightButton.on('pointerdown', function (pointer, localX, localY, event) {
+        player.setVelocityX(300);
         player.anims.play('right', true);
     });
 
-    rightButton.on('pointerup', function (pointer) {
+    rightButton.on('pointerup', function (pointer, localX, localY, event) {
         player.setVelocityX(0);
         updatePlayerAnimation();
     });
 
-    jumpButton.on('pointerdown', function (pointer) {
+    jumpButton.on('pointerdown', function (pointer, localX, localY, event) {
         if (player.body.touching.down) {
             player.setVelocityY(-600);
         }
@@ -184,7 +184,6 @@ function update() {
     }
 
     updatePlayerAnimation();
-
 }
 
 function updatePlayerAnimation() {
