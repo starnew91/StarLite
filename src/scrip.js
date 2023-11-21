@@ -10,6 +10,9 @@ var config = {
             debug: false
         }
     },
+    input: {
+        multitouch: true
+    },
     scene: {
         preload: preload,
         create: create,
