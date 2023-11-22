@@ -37,6 +37,8 @@ var leftButton;
 var rightButton;
 var jumpButton;
 
+var isPlayerMoving = false;
+
 var game = new Phaser.Game(config);
 
 function preload() {
@@ -147,6 +149,7 @@ function create() {
         if (pointer.isDown) {
             player.setVelocityX(-350);
             player.anims.play('left', true);
+            isPlayerMoving = true;
         }
     });
 
@@ -154,6 +157,7 @@ function create() {
         if (!pointer.isDown) {
             player.setVelocityX(0);
             updatePlayerAnimation();
+            isPlayerMoving = false;
         }
     });
 
@@ -161,6 +165,7 @@ function create() {
         if (pointer.isDown) {
             player.setVelocityX(350);
             player.anims.play('right', true);
+            isPlayerMoving = true;
         }
     });
 
@@ -168,6 +173,7 @@ function create() {
         if (!pointer.isDown) {
             player.setVelocityX(0);
             updatePlayerAnimation();
+            isPlayerMoving = false;
         }
     });
 
@@ -182,14 +188,6 @@ function create() {
     this.cameras.main.startFollow(player, true, 0.08, 0.08);
 }
 
-function update() {
-    if (gameOver) {
-        return;
-    }
-
-    updatePlayerAnimation();
-}
-
 function updatePlayerAnimation() {
     if (player.body.velocity.x < 0) {
         player.anims.play('left', true);
@@ -197,6 +195,16 @@ function updatePlayerAnimation() {
         player.anims.play('right', true);
     } else {
         player.anims.play('turn');
+    }
+}
+
+function update() {
+    if (gameOver) {
+        return;
+    }
+
+    if (isPlayerMoving) {
+        updatePlayerAnimation();
     }
 }
 
@@ -227,9 +235,21 @@ function hitBomb(player, bomb) {
 
     player.setTint(0xD5031A);
 
-    player.anims.play('turn');
+    player.anims.stop();
+    isPlayerMoving = false;
 
     hitBombSound.play();
+
+    var doubtText = this.add.text(player.x, player.y - 30, 'Oh no, a bomb!', { fontSize: '20px', fill: '#FFFFFF' })
+        .setOrigin(0.5, 0);
+
+    this.time.delayedCall(2000, function () {
+        doubtText.destroy();
+    }, [], this);
+
+    this.time.delayedCall(3000, function () {
+        restartGame.call(this);
+    }, [], this);
 
     gameOver = true;
 }
@@ -240,6 +260,9 @@ function restartGame() {
     player.clearTint();
     player.setX(100);
     player.setY(250);
+
+    player.anims.play('turn');
+    isPlayerMoving = true;
 
     stars.children.iterate(function (child) {
         child.enableBody(true, child.x, 0, true, true);
