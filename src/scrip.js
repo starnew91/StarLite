@@ -240,7 +240,7 @@ function hitBomb(player, bomb) {
 
     hitBombSound.play();
 
-    var doubtText = this.add.text(player.x, player.y - 30, 'Oh no, a bomb!', { fontSize: '20px', fill: '#FFFFFF' })
+    var doubtText = this.add.text(player.x, player.y - 30, 'OH NO!', { fontSize: '30px', fill: '#FF0000' })
         .setOrigin(0.5, 0);
 
     this.time.delayedCall(2000, function () {
