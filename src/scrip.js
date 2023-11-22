@@ -37,6 +37,7 @@ var leftButton;
 var rightButton;
 var jumpButton;
 
+var teclasPresionadas = {};
 var isPlayerMoving = false;
 
 var game = new Phaser.Game(config);
