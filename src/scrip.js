@@ -37,8 +37,8 @@ var leftButton;
 var rightButton;
 var jumpButton;
 
-var teclasPresionadas = {};
 var isPlayerMoving = false;
+var isJumping = false;
 
 var game = new Phaser.Game(config);
 
@@ -181,7 +181,12 @@ function create() {
     jumpButton.on('pointerdown', function (pointer) {
         if (pointer.isDown && player.body.touching.down) {
             player.setVelocityY(-600);
+            isJumping = true;
         }
+    });
+
+    jumpButton.on('pointerup', function (pointer) {
+        isJumping = false;
     });
 
     this.cameras.main.setBounds(0, 0, 800, 370);
@@ -206,6 +211,10 @@ function update() {
 
     if (isPlayerMoving) {
         updatePlayerAnimation();
+    }
+
+    if (isJumping && player.body.touching.down) {
+        isJumping = false;
     }
 }
 
