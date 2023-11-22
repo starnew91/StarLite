@@ -146,46 +146,38 @@ function create() {
     jumpButton.setScrollFactor(0);
     jumpButton.setScale(2);
 
-    leftButton.on('pointerdown', function (pointer) {
-        if (pointer.isDown) {
-            player.setVelocityX(-350);
-            player.anims.play('left', true);
-            isPlayerMoving = true;
-        }
+    leftButton.on('pointerdown', function () {
+        player.setVelocityX(-350);
+        player.anims.play('left', true);
+        isPlayerMoving = true;
     });
 
-    leftButton.on('pointerup', function (pointer) {
-        if (!pointer.isDown) {
-            player.setVelocityX(0);
-            updatePlayerAnimation();
-            isPlayerMoving = false;
-        }
+    leftButton.on('pointerup', function () {
+        player.setVelocityX(0);
+        updatePlayerAnimation();
+        isPlayerMoving = false;
     });
 
-    rightButton.on('pointerdown', function (pointer) {
-        if (pointer.isDown) {
-            player.setVelocityX(350);
-            player.anims.play('right', true);
-            isPlayerMoving = true;
-        }
+    rightButton.on('pointerdown', function () {
+        player.setVelocityX(350);
+        player.anims.play('right', true);
+        isPlayerMoving = true;
     });
 
-    rightButton.on('pointerup', function (pointer) {
-        if (!pointer.isDown) {
-            player.setVelocityX(0);
-            updatePlayerAnimation();
-            isPlayerMoving = false;
-        }
+    rightButton.on('pointerup', function () {
+        player.setVelocityX(0);
+        updatePlayerAnimation();
+        isPlayerMoving = false;
     });
 
-    jumpButton.on('pointerdown', function (pointer) {
-        if (pointer.isDown && player.body.touching.down) {
+    jumpButton.on('pointerdown', function () {
+        if (player.body.touching.down) {
             player.setVelocityY(-600);
             isJumping = true;
         }
     });
 
-    jumpButton.on('pointerup', function (pointer) {
+    jumpButton.on('pointerup', function () {
         isJumping = false;
     });
 
